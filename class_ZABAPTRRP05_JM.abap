@@ -49,6 +49,9 @@ public section.
     raising
       ZCX_ABAPTR01_JM .
   methods DELETE .
+  methods GET_PESSOA
+    exporting
+      !ES_PESSOA type ZABAPTRS03_JM .
 protected section.
 private section.
 
@@ -216,6 +219,31 @@ ENDMETHOD.
 * +--------------------------------------------------------------------------------------</SIGNATURE>
 METHOD get_nome.
   ev_nome = mv_nome.
+ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZABAPTRCL02_JM->GET_PESSOA
+* +-------------------------------------------------------------------------------------------------+
+* | [<---] ES_PESSOA                      TYPE        ZABAPTRS03_JM
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+METHOD get_pessoa.
+
+  get_nome(
+    IMPORTING
+      ev_nome = es_pessoa-nome ).
+
+  get_datanasc(
+    IMPORTING
+      ev_datanasc = es_pessoa-datanasc ).
+
+  get_nacionalidade(
+    IMPORTING
+      ev_nacionalidade = es_pessoa-nacionalidade ).
+
+  es_pessoa-cpf = get_cpf_formatado( ).
+
+  es_pessoa-sexo = get_sexo_formatado( ).
 ENDMETHOD.
 
 
