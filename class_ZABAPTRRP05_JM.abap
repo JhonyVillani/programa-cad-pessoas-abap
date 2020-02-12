@@ -11,7 +11,9 @@ public section.
       !IV_NOME type ZABAPTRDE10_JM
       !IV_DATANASC type ZABAPTRDE11_JM
       !IV_NACIONALIDADE type ZABAPTRDE12_JM
-      !IV_SEXO type ZABAPTRDE13_JM .
+      !IV_SEXO type ZABAPTRDE13_JM
+    raising
+      ZCX_ABAPTR01_JM .
   methods GET_CPF
     exporting
       !EV_CPF type ZABAPTRDE09_JM .
@@ -29,7 +31,9 @@ public section.
       !EV_SEXO type ZABAPTRDE13_JM .
   methods SET_CPF
     importing
-      !IV_CPF type ZABAPTRDE09_JM .
+      !IV_CPF type ZABAPTRDE09_JM
+    raising
+      ZCX_ABAPTR01_JM .
   methods SET_NOME
     importing
       !IV_NOME type ZABAPTRDE10_JM .
@@ -48,7 +52,9 @@ public section.
   methods GET_SEXO_FORMATADO
     returning
       value(RV_SEXO_FORMATADO) type CHAR20 .
-  methods SAVE .
+  methods SAVE
+    raising
+      ZCX_ABAPTR01_JM .
 protected section.
 private section.
 
@@ -60,7 +66,9 @@ private section.
 
   methods VALIDATE
     returning
-      value(RV_SUBRC) type SY-SUBRC .
+      value(RV_SUBRC) type SY-SUBRC
+    raising
+      ZCX_ABAPTR01_JM .
 ENDCLASS.
 
 
@@ -76,6 +84,7 @@ CLASS ZABAPTRCL02_JM IMPLEMENTATION.
 * | [--->] IV_DATANASC                    TYPE        ZABAPTRDE11_JM
 * | [--->] IV_NACIONALIDADE               TYPE        ZABAPTRDE12_JM
 * | [--->] IV_SEXO                        TYPE        ZABAPTRDE13_JM
+* | [!CX!] ZCX_ABAPTR01_JM
 * +--------------------------------------------------------------------------------------</SIGNATURE>
 METHOD constructor.
 
@@ -196,22 +205,21 @@ ENDMETHOD.
 * <SIGNATURE>---------------------------------------------------------------------------------------+
 * | Instance Public Method ZABAPTRCL02_JM->SAVE
 * +-------------------------------------------------------------------------------------------------+
+* | [!CX!] ZCX_ABAPTR01_JM
 * +--------------------------------------------------------------------------------------</SIGNATURE>
 METHOD save.
   DATA: ls_zabaptrt05_jm TYPE zabaptrt05_jm,
         lv_subrc         TYPE sysubrc. "Validaremos se o campo CPF está em branco
 
-  lv_subrc = validate( ). "Recebe a validação
+  validate( ). "Recebe a validação
 
-  IF lv_subrc IS INITIAL. "VALIDATE retorna 1 caso esteja em branco e pula fora do método
+  ls_zabaptrt05_jm-cpf           =  mv_cpf.
+  ls_zabaptrt05_jm-nome          =  mv_nome.
+  ls_zabaptrt05_jm-datanasc      =  mv_datanasc.
+  ls_zabaptrt05_jm-nacionalidade =  mv_nacionalidade.
+  ls_zabaptrt05_jm-sexo          =  mv_sexo.
+  MODIFY zabaptrt05_jm FROM ls_zabaptrt05_jm.
 
-    ls_zabaptrt05_jm-cpf           =  mv_cpf.
-    ls_zabaptrt05_jm-nome          =  mv_nome.
-    ls_zabaptrt05_jm-datanasc      =  mv_datanasc.
-    ls_zabaptrt05_jm-nacionalidade =  mv_nacionalidade.
-    ls_zabaptrt05_jm-sexo          =  mv_sexo.
-    MODIFY zabaptrt05_jm FROM ls_zabaptrt05_jm.
-  ENDIF.
 ENDMETHOD.
 
 
@@ -219,14 +227,28 @@ ENDMETHOD.
 * | Instance Public Method ZABAPTRCL02_JM->SET_CPF
 * +-------------------------------------------------------------------------------------------------+
 * | [--->] IV_CPF                         TYPE        ZABAPTRDE09_JM
+* | [!CX!] ZCX_ABAPTR01_JM
 * +--------------------------------------------------------------------------------------</SIGNATURE>
 METHOD set_cpf.
   DATA lv_len TYPE i.
 
   lv_len = strlen( iv_cpf ).
 
-  IF lv_len = 11 "Conta se o CPF contém 11 caracteres
-    AND iv_cpf+9(2) = '10'. "Verifica se o dígito é igual a 10
+  IF lv_len = 11. "Conta se o CPF contém 11 caracteres
+
+    IF iv_cpf+9(2) = '10'. "Verifica se o dígito é igual a 10
+      mv_cpf = iv_cpf.
+    ELSE.
+      RAISE EXCEPTION TYPE zcx_abaptr01_jm
+        EXPORTING
+          textid = zcx_abaptr01_jm=>cpf_dig_10.
+    ENDIF.
+
+  ELSE.
+    RAISE EXCEPTION TYPE zcx_abaptr01_jm
+      EXPORTING
+        textid = zcx_abaptr01_jm=>cpf_invalido.
+
     mv_cpf = iv_cpf.
   ENDIF.
 ENDMETHOD.
@@ -276,10 +298,13 @@ ENDMETHOD.
 * | Instance Private Method ZABAPTRCL02_JM->VALIDATE
 * +-------------------------------------------------------------------------------------------------+
 * | [<-()] RV_SUBRC                       TYPE        SY-SUBRC
+* | [!CX!] ZCX_ABAPTR01_JM
 * +--------------------------------------------------------------------------------------</SIGNATURE>
 METHOD validate.
   IF mv_cpf IS INITIAL.
-    rv_subrc = 1.
+    RAISE EXCEPTION TYPE zcx_abaptr01_jm
+      EXPORTING
+        textid = zcx_abaptr01_jm=>cpf_branco.
   ENDIF.
 ENDMETHOD.
 ENDCLASS.

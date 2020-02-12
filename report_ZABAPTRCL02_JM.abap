@@ -8,14 +8,16 @@
 
 REPORT zabaptrrp05_jm.
 
-DATA: go_pessoa_1 TYPE REF TO zabaptrcl02_jm,
-gv_cpf            TYPE zabaptrde09_jm,
-gv_cpf_formatado  TYPE char14,
-gv_nome           TYPE zabaptrde10_jm,
-gv_datanasc       TYPE zabaptrde11_jm,
-gv_nacionalidade  TYPE zabaptrde12_jm,
-gv_sexo           TYPE zabaptrde13_jm,
-gv_sexo_formatado TYPE char20.
+DATA: go_pessoa_1       TYPE REF TO zabaptrcl02_jm,
+      go_exception      TYPE REF TO zcx_abaptr01_jm, "Instanciando a classe de Exception
+      gv_message        TYPE string,
+      gv_cpf            TYPE zabaptrde09_jm,
+      gv_cpf_formatado  TYPE char14,
+      gv_nome           TYPE zabaptrde10_jm,
+      gv_datanasc       TYPE zabaptrde11_jm,
+      gv_nacionalidade  TYPE zabaptrde12_jm,
+      gv_sexo           TYPE zabaptrde13_jm,
+      gv_sexo_formatado TYPE char20.
 
 ****************************** Tela ******************************
 
@@ -32,14 +34,57 @@ SELECTION-SCREEN END OF BLOCK b1.
 
 ****************************** Instanciando obj ******************************
 
-CREATE OBJECT go_pessoa_1
-  EXPORTING
-    iv_cpf           = '12345678910'
-    iv_nome          = 'Pedro'
-    iv_datanasc      = '11112016'
-    iv_nacionalidade = 'Brasileiro'
-    iv_sexo          = 'M'.
+TRY .
 
+    CREATE OBJECT go_pessoa_1
+      EXPORTING
+        iv_cpf           = '12345678910'
+        iv_nome          = 'Pedro'
+        iv_datanasc      = '11112016'
+        iv_nacionalidade = 'Brasileiro'
+        iv_sexo          = 'M'.
+
+****************************** GET's ******************************
+
+    go_pessoa_1->get_cpf(
+      IMPORTING
+        ev_cpf = gv_cpf ).
+
+    go_pessoa_1->get_nome(
+      IMPORTING
+        ev_nome = gv_nome ).
+
+    go_pessoa_1->get_datanasc(
+      IMPORTING
+        ev_datanasc = gv_datanasc ).
+
+    go_pessoa_1->get_nacionalidade(
+      IMPORTING
+        ev_nacionalidade = gv_nacionalidade ).
+
+    go_pessoa_1->get_sexo(
+      IMPORTING
+        ev_sexo = gv_sexo ).
+
+    gv_cpf_formatado  = go_pessoa_1->get_cpf_formatado( ). "Get mais simplificado com Return
+
+    gv_sexo_formatado = go_pessoa_1->get_sexo_formatado( ).
+
+****************************** WRITE ******************************
+
+    WRITE: / 'cpf           ', gv_cpf_formatado.
+    WRITE: / 'nome          ', gv_nome.
+    WRITE: / 'datanasc      ', gv_datanasc.
+    WRITE: / 'nacionalidade ', gv_nacionalidade.
+    WRITE: / 'sexo          ', gv_sexo_formatado.
+
+    go_pessoa_1->save( ).
+
+  CATCH zcx_abaptr01_jm INTO go_exception. "Captura a Exception
+    gv_message = go_exception->get_text( ).
+    MESSAGE i001(00) WITH gv_message DISPLAY LIKE 'E'. "Mensagem a ser exibida como informativo LIKE erro
+
+ENDTRY.
 
 ****************************** SET's ******************************
 
@@ -62,39 +107,3 @@ CREATE OBJECT go_pessoa_1
 *go_pessoa_1->set_sexo(
 *  EXPORTING
 *    iv_sexo = 'M' ).
-
-****************************** GET's ******************************
-
-go_pessoa_1->get_cpf(
-  IMPORTING
-    ev_cpf = gv_cpf ).
-
-go_pessoa_1->get_nome(
-  IMPORTING
-    ev_nome = gv_nome ).
-
-go_pessoa_1->get_datanasc(
-  IMPORTING
-    ev_datanasc = gv_datanasc ).
-
-go_pessoa_1->get_nacionalidade(
-  IMPORTING
-    ev_nacionalidade = gv_nacionalidade ).
-
-go_pessoa_1->get_sexo(
-  IMPORTING
-    ev_sexo = gv_sexo ).
-
-gv_cpf_formatado  = go_pessoa_1->get_cpf_formatado( ). "Get mais simplificado com Return
-
-gv_sexo_formatado = go_pessoa_1->get_sexo_formatado( ).
-
-****************************** WRITE ******************************
-
-WRITE: / 'cpf           ', gv_cpf_formatado.
-WRITE: / 'nome          ', gv_nome.
-WRITE: / 'datanasc      ', gv_datanasc.
-WRITE: / 'nacionalidade ', gv_nacionalidade.
-WRITE: / 'sexo          ', gv_sexo_formatado.
-
-go_pessoa_1->save( ).
