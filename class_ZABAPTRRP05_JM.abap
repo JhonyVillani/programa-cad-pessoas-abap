@@ -5,15 +5,6 @@ class ZABAPTRCL02_JM definition
 
 public section.
 
-  methods CONSTRUCTOR
-    importing
-      !IV_CPF type ZABAPTRDE09_JM
-      !IV_NOME type ZABAPTRDE10_JM
-      !IV_DATANASC type ZABAPTRDE11_JM
-      !IV_NACIONALIDADE type ZABAPTRDE12_JM
-      !IV_SEXO type ZABAPTRDE13_JM
-    raising
-      ZCX_ABAPTR01_JM .
   methods GET_CPF
     exporting
       !EV_CPF type ZABAPTRDE09_JM .
@@ -55,6 +46,20 @@ public section.
   methods SAVE
     raising
       ZCX_ABAPTR01_JM .
+  methods CREATE
+    importing
+      !IV_CPF type ZABAPTRDE09_JM
+      !IV_NOME type ZABAPTRDE10_JM
+      !IV_DATANASC type ZABAPTRDE11_JM
+      !IV_NACIONALIDADE type ZABAPTRDE12_JM
+      !IV_SEXO type ZABAPTRDE13_JM
+    raising
+      ZCX_ABAPTR01_JM .
+  methods BUSCAR
+    importing
+      !IV_CPF type ZABAPTRDE09_JM
+    raising
+      ZCX_ABAPTR01_JM .
 protected section.
 private section.
 
@@ -77,7 +82,31 @@ CLASS ZABAPTRCL02_JM IMPLEMENTATION.
 
 
 * <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Public Method ZABAPTRCL02_JM->CONSTRUCTOR
+* | Instance Public Method ZABAPTRCL02_JM->BUSCAR
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_CPF                         TYPE        ZABAPTRDE09_JM
+* | [!CX!] ZCX_ABAPTR01_JM
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+METHOD buscar.
+  DATA:
+   ls_pessoa TYPE zabaptrt05_jm.
+
+  SELECT SINGLE *
+    FROM zabaptrt05_jm
+    INTO ls_pessoa
+    WHERE cpf = iv_cpf.
+
+  mv_cpf           = ls_pessoa-cpf.
+  mv_nome          = ls_pessoa-nome.
+  mv_datanasc      = ls_pessoa-datanasc.
+  mv_nacionalidade = ls_pessoa-nacionalidade.
+  mv_sexo          = ls_pessoa-sexo.
+
+ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZABAPTRCL02_JM->CREATE
 * +-------------------------------------------------------------------------------------------------+
 * | [--->] IV_CPF                         TYPE        ZABAPTRDE09_JM
 * | [--->] IV_NOME                        TYPE        ZABAPTRDE10_JM
@@ -86,7 +115,7 @@ CLASS ZABAPTRCL02_JM IMPLEMENTATION.
 * | [--->] IV_SEXO                        TYPE        ZABAPTRDE13_JM
 * | [!CX!] ZCX_ABAPTR01_JM
 * +--------------------------------------------------------------------------------------</SIGNATURE>
-METHOD constructor.
+METHOD CREATE.
 
 set_cpf(
   EXPORTING
