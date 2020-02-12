@@ -43,9 +43,6 @@ public section.
   methods GET_SEXO_FORMATADO
     returning
       value(RV_SEXO_FORMATADO) type CHAR20 .
-  methods SAVE
-    raising
-      ZCX_ABAPTR01_JM .
   methods CREATE
     importing
       !IV_CPF type ZABAPTRDE09_JM
@@ -60,6 +57,14 @@ public section.
       !IV_CPF type ZABAPTRDE09_JM
     raising
       ZCX_ABAPTR01_JM .
+  methods MODIFY
+    importing
+      !IV_NOME type ZABAPTRDE10_JM
+      !IV_DATANASC type ZABAPTRDE11_JM
+      !IV_NACIONALIDADE type ZABAPTRDE12_JM
+      !IV_SEXO type ZABAPTRDE13_JM
+    raising
+      ZCX_ABAPTR01_JM .
 protected section.
 private section.
 
@@ -69,6 +74,9 @@ private section.
   data MV_NACIONALIDADE type ZABAPTRDE12_JM .
   data MV_SEXO type ZABAPTRDE13_JM .
 
+  methods SAVE
+    raising
+      ZCX_ABAPTR01_JM .
   methods VALIDATE
     returning
       value(RV_SUBRC) type SY-SUBRC
@@ -96,6 +104,12 @@ METHOD buscar.
     INTO ls_pessoa
     WHERE cpf = iv_cpf.
 
+  IF sy-subrc IS NOT INITIAL.
+    RAISE EXCEPTION TYPE zcx_abaptr01_jm
+      EXPORTING
+        textid = zcx_abaptr01_jm=>pessoa_nao_encontrada.
+  ENDIF.
+
   mv_cpf           = ls_pessoa-cpf.
   mv_nome          = ls_pessoa-nome.
   mv_datanasc      = ls_pessoa-datanasc.
@@ -115,29 +129,31 @@ ENDMETHOD.
 * | [--->] IV_SEXO                        TYPE        ZABAPTRDE13_JM
 * | [!CX!] ZCX_ABAPTR01_JM
 * +--------------------------------------------------------------------------------------</SIGNATURE>
-METHOD CREATE.
+METHOD create.
 
-set_cpf(
-  EXPORTING
-    iv_cpf = iv_cpf ).
+  set_cpf(
+    EXPORTING
+      iv_cpf = iv_cpf ).
 
-set_nome(
-  EXPORTING
-    iv_nome = iv_nome ).
+  set_nome(
+    EXPORTING
+      iv_nome = iv_nome ).
 
-set_datanasc(
-  EXPORTING
-    iv_datanasc = iv_datanasc ).
+  set_datanasc(
+    EXPORTING
+      iv_datanasc = iv_datanasc ).
 
-set_nacionalidade(
-  EXPORTING
-    iv_nacionalidade = iv_nacionalidade ).
+  set_nacionalidade(
+    EXPORTING
+      iv_nacionalidade = iv_nacionalidade ).
 
-set_sexo(
-  EXPORTING
-    iv_sexo = iv_sexo ).
+  set_sexo(
+    EXPORTING
+      iv_sexo = iv_sexo ).
 
-endmethod.
+  save( ).
+
+ENDMETHOD.
 
 
 * <SIGNATURE>---------------------------------------------------------------------------------------+
@@ -232,7 +248,58 @@ ENDMETHOD.
 
 
 * <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Public Method ZABAPTRCL02_JM->SAVE
+* | Instance Public Method ZABAPTRCL02_JM->MODIFY
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_NOME                        TYPE        ZABAPTRDE10_JM
+* | [--->] IV_DATANASC                    TYPE        ZABAPTRDE11_JM
+* | [--->] IV_NACIONALIDADE               TYPE        ZABAPTRDE12_JM
+* | [--->] IV_SEXO                        TYPE        ZABAPTRDE13_JM
+* | [!CX!] ZCX_ABAPTR01_JM
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+METHOD modify.
+  DATA: lv_save TYPE flag. "Para controlar se houve modificação
+
+  IF iv_nome IS NOT INITIAL.
+    lv_save = abap_true.
+    set_nome(
+      EXPORTING
+        iv_nome = iv_nome ).
+  ENDIF.
+
+  IF iv_datanasc IS NOT INITIAL.
+    lv_save = abap_true.
+    set_datanasc(
+      EXPORTING
+        iv_datanasc = iv_datanasc ).
+  ENDIF.
+
+  IF iv_nacionalidade IS NOT INITIAL.
+    lv_save = abap_true.
+    set_nacionalidade(
+      EXPORTING
+        iv_nacionalidade = iv_nacionalidade ).
+  ENDIF.
+
+  IF iv_sexo IS NOT INITIAL.
+    lv_save = abap_true.
+    set_sexo(
+      EXPORTING
+        iv_sexo = iv_sexo ).
+  ENDIF.
+
+  IF lv_save NE abap_true.
+    RAISE EXCEPTION TYPE zcx_abaptr01_jm
+      EXPORTING
+        textid = zcx_abaptr01_jm=>modificacao_invalida.
+  ENDIF.
+
+  save( ).
+
+ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Private Method ZABAPTRCL02_JM->SAVE
 * +-------------------------------------------------------------------------------------------------+
 * | [!CX!] ZCX_ABAPTR01_JM
 * +--------------------------------------------------------------------------------------</SIGNATURE>

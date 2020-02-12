@@ -49,12 +49,21 @@ TRY .
         iv_nacionalidade = p_nacio
         iv_sexo          = p_sexo ).
 
-        go_pessoa_1->save( ).
         MESSAGE i001(00) WITH text-m01 DISPLAY LIKE 'S'. "Tipo i para pop-up, criando um tipo texto mNN com aparência de Sucesso
 
       WHEN 'M'.
+        go_pessoa_1->buscar( p_cpf ).
+        go_pessoa_1->modify(
+      EXPORTING
+        iv_nome          = p_nome
+        iv_datanasc      = p_datan
+        iv_nacionalidade = p_nacio
+        iv_sexo          = p_sexo ).
+
+        MESSAGE i001(00) WITH text-m02 DISPLAY LIKE 'S'.
 
       WHEN 'E'.
+        go_pessoa_1->buscar( p_cpf ).
       WHEN 'V'.
         go_pessoa_1->buscar( p_cpf ). "Só funcionou porque ele é único e IMPORTING
 
