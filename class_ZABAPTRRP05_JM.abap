@@ -20,23 +20,6 @@ public section.
   methods GET_SEXO
     exporting
       !EV_SEXO type ZABAPTRDE13_JM .
-  methods SET_CPF
-    importing
-      !IV_CPF type ZABAPTRDE09_JM
-    raising
-      ZCX_ABAPTR01_JM .
-  methods SET_NOME
-    importing
-      !IV_NOME type ZABAPTRDE10_JM .
-  methods SET_DATANASC
-    importing
-      !IV_DATANASC type ZABAPTRDE11_JM .
-  methods SET_NACIONALIDADE
-    importing
-      !IV_NACIONALIDADE type ZABAPTRDE12_JM .
-  methods SET_SEXO
-    importing
-      !IV_SEXO type ZABAPTRDE13_JM .
   methods GET_CPF_FORMATADO
     returning
       value(RV_CPF_FORMATADO) type CHAR14 .
@@ -65,6 +48,7 @@ public section.
       !IV_SEXO type ZABAPTRDE13_JM
     raising
       ZCX_ABAPTR01_JM .
+  methods DELETE .
 protected section.
 private section.
 
@@ -74,6 +58,23 @@ private section.
   data MV_NACIONALIDADE type ZABAPTRDE12_JM .
   data MV_SEXO type ZABAPTRDE13_JM .
 
+  methods SET_CPF
+    importing
+      !IV_CPF type ZABAPTRDE09_JM
+    raising
+      ZCX_ABAPTR01_JM .
+  methods SET_NOME
+    importing
+      !IV_NOME type ZABAPTRDE10_JM .
+  methods SET_DATANASC
+    importing
+      !IV_DATANASC type ZABAPTRDE11_JM .
+  methods SET_NACIONALIDADE
+    importing
+      !IV_NACIONALIDADE type ZABAPTRDE12_JM .
+  methods SET_SEXO
+    importing
+      !IV_SEXO type ZABAPTRDE13_JM .
   methods SAVE
     raising
       ZCX_ABAPTR01_JM .
@@ -153,6 +154,15 @@ METHOD create.
 
   save( ).
 
+ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZABAPTRCL02_JM->DELETE
+* +-------------------------------------------------------------------------------------------------+
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+METHOD delete.
+  DELETE FROM zabaptrt05_jm WHERE cpf = mv_cpf.
 ENDMETHOD.
 
 
@@ -320,7 +330,7 @@ ENDMETHOD.
 
 
 * <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Public Method ZABAPTRCL02_JM->SET_CPF
+* | Instance Private Method ZABAPTRCL02_JM->SET_CPF
 * +-------------------------------------------------------------------------------------------------+
 * | [--->] IV_CPF                         TYPE        ZABAPTRDE09_JM
 * | [!CX!] ZCX_ABAPTR01_JM
@@ -351,7 +361,7 @@ ENDMETHOD.
 
 
 * <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Public Method ZABAPTRCL02_JM->SET_DATANASC
+* | Instance Private Method ZABAPTRCL02_JM->SET_DATANASC
 * +-------------------------------------------------------------------------------------------------+
 * | [--->] IV_DATANASC                    TYPE        ZABAPTRDE11_JM
 * +--------------------------------------------------------------------------------------</SIGNATURE>
@@ -361,7 +371,7 @@ ENDMETHOD.
 
 
 * <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Public Method ZABAPTRCL02_JM->SET_NACIONALIDADE
+* | Instance Private Method ZABAPTRCL02_JM->SET_NACIONALIDADE
 * +-------------------------------------------------------------------------------------------------+
 * | [--->] IV_NACIONALIDADE               TYPE        ZABAPTRDE12_JM
 * +--------------------------------------------------------------------------------------</SIGNATURE>
@@ -371,7 +381,7 @@ ENDMETHOD.
 
 
 * <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Public Method ZABAPTRCL02_JM->SET_NOME
+* | Instance Private Method ZABAPTRCL02_JM->SET_NOME
 * +-------------------------------------------------------------------------------------------------+
 * | [--->] IV_NOME                        TYPE        ZABAPTRDE10_JM
 * +--------------------------------------------------------------------------------------</SIGNATURE>
@@ -381,7 +391,7 @@ ENDMETHOD.
 
 
 * <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Public Method ZABAPTRCL02_JM->SET_SEXO
+* | Instance Private Method ZABAPTRCL02_JM->SET_SEXO
 * +-------------------------------------------------------------------------------------------------+
 * | [--->] IV_SEXO                        TYPE        ZABAPTRDE13_JM
 * +--------------------------------------------------------------------------------------</SIGNATURE>

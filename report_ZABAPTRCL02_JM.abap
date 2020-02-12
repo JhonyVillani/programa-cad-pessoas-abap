@@ -64,6 +64,10 @@ TRY .
 
       WHEN 'E'.
         go_pessoa_1->buscar( p_cpf ).
+        go_pessoa_1->delete( ).
+        MESSAGE i001(00) WITH text-m03 DISPLAY LIKE 'S'.
+
+
       WHEN 'V'.
         go_pessoa_1->buscar( p_cpf ). "Só funcionou porque ele é único e IMPORTING
 
