@@ -17,6 +17,8 @@ CLASS lcl_report DEFINITION.
 *   Tabela global com dados obtidos dos objetos pós-processamento
     DATA: mt_dados_alv TYPE TABLE OF zabaptrs03_jm.
 
+    DATA: mo_alv TYPE REF TO cl_salv_table.
+
     METHODS: "Declaração dos métodos
     selecao,
     processamento,
@@ -78,5 +80,16 @@ CLASS lcl_report IMPLEMENTATION.
 
   ENDMETHOD.                    "processamento
   METHOD exibicao.
+*   Criando o relatório ALV, declarando na classe a variáveis mo_alv referenciando cl_salv_table
+*   Chama o método que constrói a saída ALV
+    CALL METHOD cl_salv_table=>factory
+      IMPORTING
+        r_salv_table = mo_alv
+      CHANGING
+        t_table      = mt_dados_alv.
+
+*   Mostra o ALV
+    mo_alv->display( ). "Imprime na tela do relatório ALV
+
   ENDMETHOD.                    "exibicao
 ENDCLASS.                    "lcl_report IMPLEMENTATION
